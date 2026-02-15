@@ -11,6 +11,8 @@ import com.banking.authentication.response.RegisterRequestResponse;
 import com.banking.authentication.response.UserResponse;
 import com.google.gson.Gson;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 
@@ -74,13 +77,6 @@ public class AuthService {
                     UserResponse.class
             );
 
-
-//        ResponseEntity<AccountResponse> response2 = restTemplate.exchange(
-//                "http://ACCOUNT/api/accounts",
-//                HttpMethod.POST,
-//                entity,
-//                UserResponse.class
-//        );
 
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 throw new RunTimeException("Failed to create user in user-service");
@@ -323,6 +319,83 @@ public class AuthService {
         String json = new Gson().toJson(event);
         kafkaProducerService.sendLoginSuccess("banking-users", json);
     }
+//    public String register1(RegisterRequest request) {
+//
+//        // Check if already exists in DB
+//        if(repo.findByEmail(request.getEmail()).isPresent())
+//            throw new RuntimeException("User already exists");
+//
+//        // Generate OTP
+//        String otp = String.valueOf(
+//                (int)(Math.random() * 900000) + 100000
+//        );
+//
+//        // Save user data in Redis
+//        redisTemplate.opsForValue().set(
+//                "register:" + request.getEmail(),
+//                request,
+//                5,
+//                TimeUnit.MINUTES
+//        );
+//
+//        // Save OTP in Redis
+//        redisTemplate.opsForValue().set(
+//                "otp:" + request.getEmail(),
+//                otp,
+//                5,
+//                TimeUnit.MINUTES
+//        );
+//
+//        sendOtpMail(request.getEmail(), otp);
+//
+//        return "OTP sent to email";
+//    }
+
+//    public boolean verifyOtp(String email, String otp) {
+//
+//        String storedOtp = (String) redisTemplate
+//                .opsForValue()
+//                .get("otp:" + email);
+//
+//        if(storedOtp == null)
+//            throw new RuntimeException("OTP expired");
+//
+//        if(!storedOtp.equals(otp))
+//            return false;
+//
+//        // Fetch stored registration data
+//        RegisterRequest request = (RegisterRequest)
+//                redisTemplate.opsForValue()
+//                        .get("register:" + email);
+//
+//        if(request == null)
+//            throw new RuntimeException("Registration expired");
+//
+//        // Save to DB
+//        User user = new User();
+//        user.setUsername(request.getUsername());
+//        user.setEmail(request.getEmail());
+//        user.setPhone(request.getPhone());
+//        user.setPassword(encoder.encode(request.getPassword()));
+//        user.setRoles(
+//                request.getRole() != null ?
+//                        request.getRole() : "USER"
+//        );
+//
+//        repo.save(user);
+//
+//        // Delete Redis keys
+//        redisTemplate.delete("otp:" + email);
+//        redisTemplate.delete("register:" + email);
+//
+//        // Call user-service
+//        createUserInUserService(user);
+//
+//        // Send welcome mail
+//        sendWelcomeMail(user);
+//
+//        return true;
+//    }
 
 }
 

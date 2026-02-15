@@ -51,6 +51,13 @@ public class AuthController {
        return new ResponseEntity<>(s,HttpStatus.OK);
     }
 
-
+//@PostMapping("/otp")
+//    public ResponseEntity<String> verifyOtp(@RequestParam String email,@RequestParam String otp) throws Exception{
+//        boolean isValid=authService.verifyOtp(email,otp);
+//        if(isValid)
+//            return new ResponseEntity<>("OTP verified successfully",HttpStatus.OK);
+//        else
+//            return new ResponseEntity<>("Invalid OTP",HttpStatus.BAD_REQUEST);
+//    }
 
 }

@@ -42,6 +42,7 @@ public class AccountService {
 
     @Autowired
     private RedisService redisService;
+
     public Account createAccount(String username, String token, AccountRequest accountRequest) {
 
         // Check if user already has an account
