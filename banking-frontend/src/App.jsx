@@ -25,6 +25,7 @@ import KycPage from "./pages/dashboard/KycPage";
 import AdminLoans from "./pages/Admin-dashboard/AdminLoans";
 import AdminUsers from "./pages/Admin-dashboard/AdminUsers";
 import AdminActiveLoans from "./pages/Admin-dashboard/AdminActiveLoans";
+import VerifyOtp from "./pages/auth/VerifyOtp";
 
 export default function App() {
   const username = localStorage.getItem("username");
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
 
         {/* SMART DASHBOARD ROUTE */}
         <Route

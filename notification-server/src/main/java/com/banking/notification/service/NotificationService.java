@@ -18,12 +18,6 @@ public class NotificationService {
         emailService.sendEmail(event.getEmail(),event.getUsername(),event.getBody());
 
     }
-    public void processOtp(String message) throws MessagingException {
-        OtpResponse event = new Gson().fromJson(message, OtpResponse.class);
-
-        emailService.sendEmail(event.getEmail(),"OTP verification",event.getBody());
-
-    }
 
     public void processAccountCreated(String message) throws MessagingException {
         AccountCreatedEvent event = new Gson().fromJson(message, AccountCreatedEvent.class);

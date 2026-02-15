@@ -329,7 +329,7 @@ public class AuthService {
         String key="otp:"+email;
     redisService.set(key, otp, 5); // Store OTP in Redis with 5 minutes expiration
 
-        OtpResponse event = new OtpResponse();
+        RegisterRequestResponse event = new RegisterRequestResponse();
         String userEmail = email;
 
         String body = "<!DOCTYPE html>" +
@@ -359,6 +359,7 @@ public class AuthService {
 
 
         event.setEmail(userEmail);  // Recipient email
+        event.setUsername("Your OTP Code"); // Subject
         event.setBody(body);        // HTML email body
 
 

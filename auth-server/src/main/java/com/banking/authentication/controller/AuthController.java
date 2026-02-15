@@ -68,4 +68,12 @@ public class AuthController {
             return new ResponseEntity<>("Invalid OTP",HttpStatus.BAD_REQUEST);
     }
 
+    @PostMapping("/resend-otp")
+    public ResponseEntity<String> resendOtp(@RequestParam String email) {
+
+        String res=  authService.sendOtp(email);
+
+        return ResponseEntity.ok("OTP Resent");
+    }
+
 }
