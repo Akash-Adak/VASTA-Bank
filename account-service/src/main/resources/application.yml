@@ -20,12 +20,16 @@ spring:
   cache:
     type: redis
 
-  data:
-    redis:
-      host: redis                                # Redis container name
-      port: 6379                                 # default Redis port in Docker
-      password: LKIudJQ9HnyyOzJQZdBVf3BjDWQSHyac
-      timeout: 3000
+  redis:
+    host: redis-12002.c305.ap-south-1-1.ec2.cloud.redislabs.com
+    port: 12002
+    password: XyZ@AqZj9vvL1678QkXsE2MwB50ngbE82AEF
+    timeout: 5000
+
+    ssl: true   # 🔴 IMPORTANT for Redis Cloud
+
+    cache:
+      type: redis
 
 
   kafka:

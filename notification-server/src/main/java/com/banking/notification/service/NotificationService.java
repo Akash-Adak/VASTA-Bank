@@ -1,9 +1,6 @@
 package com.banking.notification.service;
 
-import com.banking.notification.model.AccountCreatedEvent;
-import com.banking.notification.model.LoansEvent;
-import com.banking.notification.model.TransactionCompletedEvent;
-import com.banking.notification.model.UserRegisteredEvent;
+import com.banking.notification.model.*;
 import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -49,7 +49,10 @@ export default function Signup() {
       };
 
       await axios.post(`${API}/api/auth/register`, payload);
-      navigate("/login");
+
+      navigate("/verify-otp", {
+      state: { email: form.email }
+    });
     } catch (e) {
       setError(e.response?.data?.message || "Registration failed. Please try again.");
     } finally {

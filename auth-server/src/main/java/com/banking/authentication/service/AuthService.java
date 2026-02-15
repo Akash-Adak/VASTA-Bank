@@ -9,8 +9,10 @@ import com.banking.authentication.model.Userdto;
 import com.banking.authentication.repository.UserRepository;
 import com.banking.authentication.response.RegisterRequestResponse;
 import com.banking.authentication.response.UserResponse;
+import com.banking.authentication.response.OtpResponse;
 import com.google.gson.Gson;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import java.util.Map;
 
 public class AuthService {
 
+    @Autowired
+    private RedisService redisService;
     private final  UserRepository repo;
 
     private final PasswordEncoder encoder;
@@ -74,13 +78,6 @@ public class AuthService {
                     UserResponse.class
             );
 
-
-//        ResponseEntity<AccountResponse> response2 = restTemplate.exchange(
-//                "http://ACCOUNT/api/accounts",
-//                HttpMethod.POST,
-//                entity,
-//                UserResponse.class
-//        );
 
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 throw new RunTimeException("Failed to create user in user-service");
@@ -322,6 +319,82 @@ public class AuthService {
 
         String json = new Gson().toJson(event);
         kafkaProducerService.sendLoginSuccess("banking-users", json);
+    }
+
+    public String sendOtp(String email) {
+        // Generate OTP
+        String otp = String.valueOf(
+                (int)(Math.random() * 900000) + 100000
+        );
+        String key="otp:"+email;
+    redisService.set(key, otp, 5); // Store OTP in Redis with 5 minutes expiration
+
+        RegisterRequestResponse event = new RegisterRequestResponse();
+        String userEmail = email;
+
+        String body = "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "  <style>" +
+                "    body { font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; }" +
+                "    .container { background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }" +
+                "    h2 { color: #2c3e50; }" +
+                "    .otp { font-size: 24px; font-weight: bold; color: #e74c3c; margin: 20px 0; }" +
+                "    p { color: #555555; }" +
+                "  </style>" +
+                "</head>" +
+                "<body>" +
+                "  <div class='container'>" +
+                "    <h2>VASTA Bank - OTP Verification</h2>" +
+                "    <p>Dear " + email + ",</p>" +
+                "    <p>Use the following One-Time Password (OTP) to complete your verification process:</p>" +
+                "    <div class='otp'>" + otp + "</div>" +
+                "    <p>This OTP is valid for <strong>2 minutes</strong>. Please do not share it with anyone.</p>" +
+                "    <p>If you did not request this, please ignore this email.</p>" +
+                "    <br>" +
+                "    <p>Best regards,<br>VASTA Bank Security Team</p>" +
+                "  </div>" +
+                "</body>" +
+                "</html>";
+
+
+        event.setEmail(userEmail);  // Recipient email
+        event.setUsername("Your OTP Code"); // Subject
+        event.setBody(body);        // HTML email body
+
+
+        String json = new Gson().toJson(event);
+        kafkaProducerService.sendOtp("banking-users", json);
+        return "OTP sent to phone";
+    }
+
+    public boolean verifyOtp(String email, String otp) throws Exception {
+        String key="otp:"+email;
+        String storedOtp = (String)redisService.get(key,String.class);
+
+        if(storedOtp == null)
+            throw new RuntimeException("OTP expired");
+
+        if(!storedOtp.equals(otp))
+            return false;
+
+        // Fetch stored registration data
+        RegisterRequest request = (RegisterRequest) redisService.get("user:" + email, RegisterRequest.class);
+
+        if(request == null)
+            throw new RuntimeException("Registration expired");
+
+        // Save to DB
+        String s=register(request);
+
+         User user = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found after registration"));
+
+        // Delete Redis keys
+        redisService.delete("otp:" + email);
+        redisService.delete("user:" + email);
+
+        return true;
     }
 
 }
