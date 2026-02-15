@@ -1,9 +1,6 @@
 package com.banking.notification.service;
 
-import com.banking.notification.model.AccountCreatedEvent;
-import com.banking.notification.model.LoansEvent;
-import com.banking.notification.model.TransactionCompletedEvent;
-import com.banking.notification.model.UserRegisteredEvent;
+import com.banking.notification.model.*;
 import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +16,12 @@ public class NotificationService {
         UserRegisteredEvent event = new Gson().fromJson(message, UserRegisteredEvent.class);
 
         emailService.sendEmail(event.getEmail(),event.getUsername(),event.getBody());
+
+    }
+    public void processOtp(String message) throws MessagingException {
+        OtpResponse event = new Gson().fromJson(message, OtpResponse.class);
+
+        emailService.sendEmail(event.getEmail(),"OTP verification",event.getBody());
 
     }
 

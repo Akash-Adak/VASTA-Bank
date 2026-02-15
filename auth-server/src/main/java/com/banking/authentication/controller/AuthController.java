@@ -7,6 +7,8 @@ import com.banking.authentication.model.RegisterRequest;
 import com.banking.authentication.repository.UserRepository;
 
 import com.banking.authentication.service.AuthService;
+import com.banking.authentication.service.RedisService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,8 @@ public class AuthController {
     private final  AuthService authService;
 
     private final  UserRepository userRepository;
+    @Autowired
+    private RedisService redisService;
 
     public AuthController(AuthService authService,UserRepository userRepository) {
         this.authService=authService;
@@ -37,7 +41,11 @@ public class AuthController {
          userRepository.findByPhone(request.getPhone()).isPresent()){
             throw new UserAlreadyExistsException("User already exists with same username, email, or phone");
         }
-          String  res=  authService.register(request);
+        String key= "user:"+request.getEmail();
+        redisService.set(key,request,10);
+//          String res=  authService.register(request);
+//          String  res=  authService.register(request);
+            String res=  authService.sendOtp(request.getEmail());
           return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
 
@@ -51,13 +59,13 @@ public class AuthController {
        return new ResponseEntity<>(s,HttpStatus.OK);
     }
 
-//@PostMapping("/otp")
-//    public ResponseEntity<String> verifyOtp(@RequestParam String email,@RequestParam String otp) throws Exception{
-//        boolean isValid=authService.verifyOtp(email,otp);
-//        if(isValid)
-//            return new ResponseEntity<>("OTP verified successfully",HttpStatus.OK);
-//        else
-//            return new ResponseEntity<>("Invalid OTP",HttpStatus.BAD_REQUEST);
-//    }
+@PostMapping("/otp")
+    public ResponseEntity<String> verifyOtp(@RequestParam String email,@RequestParam String otp) throws Exception{
+        boolean isValid=authService.verifyOtp(email,otp);
+        if(isValid)
+            return new ResponseEntity<>("Register verified successfully",HttpStatus.OK);
+        else
+            return new ResponseEntity<>("Invalid OTP",HttpStatus.BAD_REQUEST);
+    }
 
 }

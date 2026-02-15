@@ -19,4 +19,7 @@ public class KafkaProducerService {
     public void sendLoginSuccess(String topic, String json) {
         kafkaTemplate.send(topic,json);
     }
+    public void sendOtp(String topic, String json) {
+        kafkaTemplate.send(topic,json);
+    }
 }
