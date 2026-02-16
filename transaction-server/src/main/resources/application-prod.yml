@@ -1,0 +1,42 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: transaction
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/banking_system
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+jwt:
+  expiration: 3600000
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  metrics:
+    export:
+      prometheus:
+        enabled: true

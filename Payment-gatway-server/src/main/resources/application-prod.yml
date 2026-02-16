@@ -1,0 +1,43 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: payment
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/banking_system
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+
+razorpay:
+  key: ${RAZORPAY_KEY:rzp_test_key}
+  secret: ${RAZORPAY_SECRET:rzp_test_secret}
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  metrics:
+    export:
+      prometheus:
+        enabled: true
