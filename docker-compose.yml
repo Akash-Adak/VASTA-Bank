@@ -101,8 +101,8 @@ services:
   auth-service:
     image: akta2910/vasta-auth:latest
     container_name: auth-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8081:8081"
     volumes:
@@ -189,13 +189,13 @@ services:
   loan-service:
     image: akta2910/vasta-loan:latest
     container_name: loan-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vasta_loans?createDatabaseIfNotExist=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vasta_loans?createDatabaseIfNotExist=true
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     volumes:
       - ./config:/app/config:ro
     ports:
@@ -210,6 +210,72 @@ services:
     networks:
       - vasta-network
 
+
+  # =========================
+  # kyc Service (Distroless)
+  # =========================
+  kyc-service:
+    image: akta2910/vasta-kyc:latest
+    container_name: kyc-service
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
+    ports:
+      - "8087:8087"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+  # =========================
+  # admin Service (Distroless)
+  # =========================
+  admin-service:
+    image: akta2910/vasta-admin:latest
+    container_name: admin-server
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
+    ports:
+      - "8088:8088"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+#   =========================
+#   payment Service (Distroless)
+#   =========================
+  payment-service:
+    image: akta2910/vasta-payment:latest
+    container_name: payment-server
+    #    environment:
+    #      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
+    ports:
+      - "8089:8089"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
   # =========================
   # Notification Service (Distroless)
   # =========================
