@@ -27,6 +27,12 @@ jobs:
             image: vasta-notify
           - service: loan-server
             image: vasta-loan
+          - service: kyc-service
+            image: vasta-kyc
+          - service: admin-server
+            image: vasta-admin
+          - service: Payment-gatway-server
+            image: vasta-payment
 
     steps:
       # Step 1: Checkout code
