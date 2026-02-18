@@ -92,8 +92,14 @@ services:
     ports:
       - "8761:8761"
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - vasta-network
+
 
   # =========================
   # Auth Service (Distroless)
@@ -101,8 +107,6 @@ services:
   auth-service:
     image: akta2910/vasta-auth:latest
     container_name: auth-service
-#    environment:
-#      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8081:8081"
     volumes:
@@ -127,8 +131,6 @@ services:
   user-service:
     image: akta2910/vasta-user:latest
     container_name: user-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
     volumes:
       - ./config:/app/config:ro
     ports:
@@ -147,8 +149,6 @@ services:
   account-service:
     image: akta2910/vasta-account:latest
     container_name: account-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
     volumes:
       - ./config:/app/config:ro
     ports:
@@ -167,8 +167,6 @@ services:
   transaction-service:
     image: akta2910/vasta-transaction:latest
     container_name: transaction-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
     volumes:
       - ./config:/app/config:ro
     ports:
@@ -283,7 +281,7 @@ services:
     image: akta2910/vasta-notify:latest
     container_name: notification-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      EMAIL_PASSWORD: wtliwgoqkzrgrlcg
     volumes:
       - ./config:/app/config:ro
     ports:

@@ -7,7 +7,7 @@ spring:
 
 
   datasource:
-    url: jdbc:mysql://mysql:3306/banking_system
+    url: jdbc:mysql://mysql:3306/vasta_system?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
