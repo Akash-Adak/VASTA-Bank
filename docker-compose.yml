@@ -208,6 +208,72 @@ services:
     networks:
       - vasta-network
 
+
+  # =========================
+  # kyc Service (Distroless)
+  # =========================
+  kyc-service:
+    image: akta2910/vasta-kyc:latest
+    container_name: kyc-service
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
+    ports:
+      - "8087:8087"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+  # =========================
+  # admin Service (Distroless)
+  # =========================
+  admin-service:
+    image: akta2910/vasta-admin:latest
+    container_name: admin-server
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
+    ports:
+      - "8088:8088"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+#   =========================
+#   payment Service (Distroless)
+#   =========================
+  payment-service:
+    image: akta2910/vasta-payment:latest
+    container_name: payment-server
+    #    environment:
+    #      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
+    ports:
+      - "8089:8089"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
   # =========================
   # Notification Service (Distroless)
   # =========================
