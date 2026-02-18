@@ -1,0 +1,3 @@
+spring:
+    profiles:
+        active: prod   # change to prod when needed

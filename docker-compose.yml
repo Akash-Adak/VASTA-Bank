@@ -214,6 +214,8 @@ services:
   notification-service:
     image: akta2910/vasta-notify:latest
     container_name: notification-service
+    environment:
+      EMAIL_PASSWORD: wtliwgoqkzrgrlcg
     volumes:
       - ./config:/app/config:ro
     ports:
