@@ -1,12 +1,13 @@
 version: "3.8"
 
 services:
+
   # =========================
   # MySQL
   # =========================
   mysql:
     image: mysql:8.0
-    container_name: mysql-db
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: vasta_system
@@ -23,15 +24,16 @@ services:
     networks:
       - vasta-network
 
+
   # =========================
   # Redis
   # =========================
   redis:
     image: redis:7.2-alpine
     container_name: redis
+    restart: always
     ports:
       - "6379:6379"
-    restart: always
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -39,6 +41,7 @@ services:
       retries: 5
     networks:
       - vasta-network
+
 
   # =========================
   # Zookeeper
@@ -59,12 +62,16 @@ services:
     networks:
       - vasta-network
 
+
   # =========================
   # Kafka
   # =========================
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -73,18 +80,16 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    depends_on:
-      zookeeper:
-        condition: service_healthy
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
       - vasta-network
 
+
   # =========================
-  # Eureka Server (Distroless)
+  # Eureka Server
   # =========================
   eureka-server:
     image: akta2910/vasta-eureka:latest
@@ -102,16 +107,13 @@ services:
 
 
   # =========================
-  # Auth Service (Distroless)
+  # Auth Service (LOCAL BUILD)
   # =========================
   auth-service:
     image: akta2910/vasta-auth:latest
     container_name: auth-service
     ports:
       - "8081:8081"
-    volumes:
-      - ./secrets:/etc/secrets:ro
-      - ./config:/app/config:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -120,55 +122,55 @@ services:
       kafka:
         condition: service_started
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+
+    restart: always
     networks:
       - vasta-network
 
 
   # =========================
-  # User Service (Distroless)
+  # User Service
   # =========================
   user-service:
     image: akta2910/vasta-user:latest
     container_name: user-service
-    volumes:
-      - ./config:/app/config:ro
     ports:
       - "8082:8082"
     depends_on:
       auth-service:
         condition: service_started
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    restart: always
     networks:
       - vasta-network
 
+
   # =========================
-  # Account Service (Distroless)
+  # Account Service
   # =========================
   account-service:
     image: akta2910/vasta-account:latest
     container_name: account-service
-    volumes:
-      - ./config:/app/config:ro
     ports:
       - "8083:8083"
     depends_on:
       auth-service:
         condition: service_started
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    restart: always
     networks:
       - vasta-network
 
+
   # =========================
-  # Transaction Service (Distroless)
+  # Transaction Service
   # =========================
   transaction-service:
     image: akta2910/vasta-transaction:latest
     container_name: transaction-service
-    volumes:
-      - ./config:/app/config:ro
     ports:
       - "8084:8084"
     depends_on:
@@ -177,58 +179,95 @@ services:
       auth-service:
         condition: service_started
       eureka-server:
-        condition: service_started
-    networks:
-      - vasta-network
-
-  # =========================
-  # Loan Service (Distroless)
-  # =========================
-  loan-service:
-    image: akta2910/vasta-loan:latest
-    container_name: loan-service
-#    environment:
-#      SPRING_PROFILES_ACTIVE: docker
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vasta_loans?createDatabaseIfNotExist=true
-#      SPRING_DATASOURCE_USERNAME: root
-#      SPRING_DATASOURCE_PASSWORD: root
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    volumes:
-      - ./config:/app/config:ro
-    ports:
-      - "8086:8086"
-    depends_on:
-      mysql:
         condition: service_healthy
-      kafka:
-        condition: service_started
-      eureka-server:
-        condition: service_started
+    restart: always
     networks:
       - vasta-network
 
+
   # =========================
-  # Notification Service (Distroless)
+  # Notification Service
   # =========================
   notification-service:
     image: akta2910/vasta-notify:latest
     container_name: notification-service
-    environment:
-      EMAIL_PASSWORD: wtliwgoqkzrgrlcg
-    volumes:
-      - ./config:/app/config:ro
     ports:
       - "8085:8085"
+    env_file:
+      - .env
     depends_on:
       kafka:
         condition: service_started
       auth-service:
         condition: service_started
       eureka-server:
-        condition: service_started
+        condition: service_healthy
+    restart: always
     networks:
       - vasta-network
+
+
+  # =========================
+  # Payment Service
+  # =========================
+  payment-service:
+    image: akta2910/vasta-payment:latest
+    container_name: payment-service
+    ports:
+      - "8089:8089"   # FIXED PORT
+    env_file:
+      - .env
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+    restart: always
+    networks:
+      - vasta-network
+
+
+  # =========================
+  # KYC Service
+  # =========================
+  kyc-service:
+    image: akta2910/vasta-kyc:latest
+    container_name: kyc-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+    restart: always
+    networks:
+      - vasta-network
+
+
+  # =========================
+  # Admin Service
+  # =========================
+  admin-service:
+    image: akta2910/vasta-admin:latest
+    container_name: admin-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+    restart: always
+    networks:
+      - vasta-network
+
 
 # =========================
 # Volumes
@@ -236,6 +275,7 @@ services:
 volumes:
   mysql_data:
   kafka_data:
+
 
 # =========================
 # Network
