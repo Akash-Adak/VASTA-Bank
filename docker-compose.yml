@@ -214,7 +214,7 @@ services:
     image: akta2910/vasta-payment:latest
     container_name: payment-service
     ports:
-      - "8089:8089"   # FIXED PORT
+      - "8089:8089"
     env_file:
       - .env
     depends_on:

@@ -34,7 +34,6 @@ spring:
       host: redis
       port: 6379
       timeout: 5000
-      ssl: false
 
 jwt:
   expiration: 3600000
