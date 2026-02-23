@@ -23,12 +23,12 @@ spring:
 
   cache:
     type: redis
-
-  redis:
-    host: redis
-    port: 6379
-    timeout: 5000
-    ssl: false
+  data:
+    redis:
+      host: redis
+      port: 6379
+      timeout: 5000
+      ssl: false
 
   kafka:
     bootstrap-servers: kafka:9092
