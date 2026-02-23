@@ -132,57 +132,57 @@ services:
   # =========================
   # User Service
   # =========================
-  user-service:
-    image: akta2910/vasta-user:latest
-    container_name: user-service
-    ports:
-      - "8082:8082"
-    depends_on:
-      auth-service:
-        condition: service_started
-      eureka-server:
-        condition: service_healthy
-    restart: always
-    networks:
-      - vasta-network
+#  user-service:
+#    image: akta2910/vasta-user:latest
+#    container_name: user-service
+#    ports:
+#      - "8082:8082"
+#    depends_on:
+#      auth-service:
+#        condition: service_started
+#      eureka-server:
+#        condition: service_healthy
+#    restart: always
+#    networks:
+#      - vasta-network
 
 
   # =========================
   # Account Service
   # =========================
-  account-service:
-    image: akta2910/vasta-account:latest
-    container_name: account-service
-    ports:
-      - "8083:8083"
-    depends_on:
-      auth-service:
-        condition: service_started
-      eureka-server:
-        condition: service_healthy
-    restart: always
-    networks:
-      - vasta-network
+#  account-service:
+#    image: akta2910/vasta-account:latest
+#    container_name: account-service
+#    ports:
+#      - "8083:8083"
+#    depends_on:
+#      auth-service:
+#        condition: service_started
+#      eureka-server:
+#        condition: service_healthy
+#    restart: always
+#    networks:
+#      - vasta-network
 
 
   # =========================
   # Transaction Service
   # =========================
-  transaction-service:
-    image: akta2910/vasta-transaction:latest
-    container_name: transaction-service
-    ports:
-      - "8084:8084"
-    depends_on:
-      kafka:
-        condition: service_started
-      auth-service:
-        condition: service_started
-      eureka-server:
-        condition: service_healthy
-    restart: always
-    networks:
-      - vasta-network
+#  transaction-service:
+#    image: akta2910/vasta-transaction:latest
+#    container_name: transaction-service
+#    ports:
+#      - "8084:8084"
+#    depends_on:
+#      kafka:
+#        condition: service_started
+#      auth-service:
+#        condition: service_started
+#      eureka-server:
+#        condition: service_healthy
+#    restart: always
+#    networks:
+#      - vasta-network
 
 
   # =========================
@@ -232,41 +232,41 @@ services:
   # =========================
   # KYC Service
   # =========================
-  kyc-service:
-    image: akta2910/vasta-kyc:latest
-    container_name: kyc-service
-    ports:
-      - "8087:8087"
-    depends_on:
-      kafka:
-        condition: service_started
-      auth-service:
-        condition: service_started
-      eureka-server:
-        condition: service_healthy
-    restart: always
-    networks:
-      - vasta-network
+#  kyc-service:
+#    image: akta2910/vasta-kyc:latest
+#    container_name: kyc-service
+#    ports:
+#      - "8087:8087"
+#    depends_on:
+#      kafka:
+#        condition: service_started
+#      auth-service:
+#        condition: service_started
+#      eureka-server:
+#        condition: service_healthy
+#    restart: always
+#    networks:
+#      - vasta-network
 
 
   # =========================
   # Admin Service
   # =========================
-  admin-service:
-    image: akta2910/vasta-admin:latest
-    container_name: admin-service
-    ports:
-      - "8088:8088"
-    depends_on:
-      mysql:
-        condition: service_healthy
-      kafka:
-        condition: service_started
-      eureka-server:
-        condition: service_healthy
-    restart: always
-    networks:
-      - vasta-network
+#  admin-service:
+#    image: akta2910/vasta-admin:latest
+#    container_name: admin-service
+#    ports:
+#      - "8088:8088"
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_started
+#      eureka-server:
+#        condition: service_healthy
+#    restart: always
+#    networks:
+#      - vasta-network
 
 
 # =========================
