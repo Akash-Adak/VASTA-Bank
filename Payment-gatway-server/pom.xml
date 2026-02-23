@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Payment-gatway-server</artifactId>
+    <artifactId>payment-gatway-server</artifactId>
 
     <properties>
         <java.version>17</java.version>
