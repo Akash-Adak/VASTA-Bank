@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: account
+  namespace: vasta-bank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: account
+  template:
+    metadata:
+      labels:
+        app: account
+    spec:
+      containers:
+        - name: account
+          image: akta2910/vasta-account:latest
+          envFrom:
+            - configMapRef:
+                name: vasta-config
+            - secretRef:
+                name: vasta-secret
+          ports:
+            - containerPort: 8083
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: account
+  namespace: vasta-bank
+spec:
+  selector:
+    app: account
+  ports:
+    - port: 8083
+      targetPort: 8083
