@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: YOUR_DOCKER_USERNAME/vasta-frontend:latest
+          image: akta2910/vasta-frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
