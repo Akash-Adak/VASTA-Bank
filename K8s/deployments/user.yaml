@@ -1,37 +1,45 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth
+  name: user
   namespace: vasta-bank
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: auth
+      app: user
   template:
     metadata:
       labels:
-        app: auth
+        app: user
     spec:
       containers:
-        - name: auth
-          image: YOUR_DOCKER_USERNAME/vasta-auth:latest
+        - name: user
+          image: akta2910/vasta-user:latest
           envFrom:
             - configMapRef:
                 name: vasta-config
             - secretRef:
                 name: vasta-secret
           ports:
-            - containerPort: 8080
+            - containerPort: 8082
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth
+  name: user
   namespace: vasta-bank
 spec:
   selector:
-    app: auth
+    app: user
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 8082
+      targetPort: 8082

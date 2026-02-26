@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: eureka
-          image: YOUR_DOCKER_USERNAME/vasta-eureka:latest
+          image: akta2910/vasta-eureka:latest
           ports:
             - containerPort: 8761
 ---

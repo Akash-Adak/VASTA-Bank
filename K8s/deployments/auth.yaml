@@ -15,14 +15,22 @@ spec:
     spec:
       containers:
         - name: auth
-          image: YOUR_DOCKER_USERNAME/vasta-admin:latest
+          image: akta2910/vasta-auth:latest
           envFrom:
             - configMapRef:
                 name: vasta-config
             - secretRef:
                 name: vasta-secret
           ports:
-            - containerPort: 8088
+            - containerPort: 8081
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
 ---
 apiVersion: v1
 kind: Service
@@ -33,5 +41,5 @@ spec:
   selector:
     app: auth
   ports:
-    - port: 8088
-      targetPort: 8088
+    - port: 8081
+      targetPort: 8081

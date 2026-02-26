@@ -42,3 +42,5 @@ account-service/src/main/resources/application.yml
 kyc-service/src/main/resources/application.yml
 docker-compose.yml
 .env
+
+K8s/secret.yaml
