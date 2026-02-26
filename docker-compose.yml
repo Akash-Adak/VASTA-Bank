@@ -88,6 +88,19 @@ services:
       - vasta-network
 
 
+# =========================
+# Frontend
+# =========================
+
+  frontend:
+    image: akta2910/vasta-frontend:latest
+    container_name: vasta-frontend
+    ports:
+      - "5173:80"
+    networks:
+      - vasta-network
+
+
   # =========================
   # Eureka Server
   # =========================
@@ -267,6 +280,9 @@ services:
     restart: always
     networks:
       - vasta-network
+
+
+
 
 
 # =========================

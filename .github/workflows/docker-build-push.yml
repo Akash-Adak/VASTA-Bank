@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         include:
+          # ---------------- BACKEND SERVICES ----------------
           - service: eureka-server
             image: vasta-eureka
           - service: auth-server
@@ -34,20 +35,27 @@ jobs:
           - service: Payment-gatway-server
             image: vasta-payment
 
+          # ---------------- FRONTEND ----------------
+          - service: banking-frontend
+            image: vasta-frontend
+
     steps:
       # Step 1: Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 17 for Maven build
+      # Step 2: Setup JDK (only needed for backend)
       - name: Set up JDK 17
+        if: matrix.service != 'banking-frontend'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: maven
 
-      # Step 3: Build all microservices JARs
+      # Step 3: Build backend services (skip for frontend)
       - name: Build with Maven
+        if: matrix.service != 'banking-frontend'
         run: mvn -B clean package -DskipTests
 
       # Step 4: Set up Docker Buildx
@@ -61,12 +69,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 6: Get short commit SHA (for tagging)
-      - name: Get short commit SHA
-        id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      # Step 7: Build and push Docker images for each service
+      # Step 6: Build and push Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
