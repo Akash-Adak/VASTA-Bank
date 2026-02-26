@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: transaction-hpa
+  name: notification-hpa
   namespace: vasta-bank
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: transaction
+    name: notification
   minReplicas: 2
   maxReplicas: 6
   metrics:
