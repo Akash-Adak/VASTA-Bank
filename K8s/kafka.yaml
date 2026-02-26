@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  namespace: vasta-bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: bitnami/zookeeper:latest
+          env:
+            - name: ALLOW_ANONYMOUS_LOGIN
+              value: "yes"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  namespace: vasta-bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: bitnami/kafka:latest
+          env:
+            - name: KAFKA_CFG_ZOOKEEPER_CONNECT
+              value: zookeeper:2181
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "yes"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: vasta-bank
+spec:
+  selector:
+    app: kafka
+  ports:
+    - port: 9092
+      targetPort: 9092

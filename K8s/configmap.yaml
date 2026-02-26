@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vasta-config
+  namespace: vasta-bank
+data:
+  SPRING_PROFILES_ACTIVE: prod
+  EUREKA_SERVER_URL: http://eureka:8761/eureka
+  MYSQL_HOST: mysql
+  MYSQL_PORT: "3306"
+  REDIS_HOST: redis
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
