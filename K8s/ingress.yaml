@@ -5,7 +5,7 @@ metadata:
   namespace: vasta-bank
 spec:
   rules:
-    - host: vastabank.local
+    - host: localhost
       http:
         paths:
           - path: /
