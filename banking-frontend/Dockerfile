@@ -23,14 +23,13 @@ RUN npm run build
 # -----------------------------
 FROM nginx:stable-alpine
 
-# Remove default nginx config
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy build files from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Expose port
+# 🔥 ADD THIS
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
