@@ -77,7 +77,7 @@ export default function VerifyOtp() {
       setError("");
 
       await axios.post(
-        `${API}/otp`,
+        `${API}/api/auth/otp`,
         null,
         {
           params: {
@@ -109,7 +109,7 @@ export default function VerifyOtp() {
 
     try {
 
-      await axios.post(`${API}/resend-otp`, null, {
+      await axios.post(`${API}/api/auth/resend-otp`, null, {
         params: { email }
       });
 

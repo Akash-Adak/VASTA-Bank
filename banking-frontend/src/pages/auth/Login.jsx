@@ -29,7 +29,7 @@ const  handleLogin = async (e) => {
   setError("");
 
   try {
-    const res = await axios.post(`${API}/login`, form);
+    const res = await axios.post(`${API}/api/auth/login`, form);
 
 
     // Save data immediately
