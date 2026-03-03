@@ -48,8 +48,8 @@ export default function Signup() {
         password: form.password,
       };
 
-      await axios.post(`${API}/api/auth/register`, payload);
-
+//       await axios.post(`${API}/api/auth/register`, payload);
+await axios.post("/api/auth/register", payload);
       navigate("/verify-otp", {
       state: { email: form.email }
     });
