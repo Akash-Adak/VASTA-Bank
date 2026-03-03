@@ -19,7 +19,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
-  const API = import.meta.env.k8s.VITE_AUTH_URL;
+  const API = import.meta.env.VITE_AUTH_URL;
 
   const handleSignup = async (e) => {
     e.preventDefault();
