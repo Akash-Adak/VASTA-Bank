@@ -10,7 +10,7 @@ export default function VerifyOtp() {
   const location = useLocation();
 
   const email = location.state?.email;
-  const API = import.meta.env.VITE_AUTH_URL;
+  const API = import.meta.env.k8s.VITE_AUTH_URL;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
@@ -77,7 +77,7 @@ export default function VerifyOtp() {
       setError("");
 
       await axios.post(
-        `${API}/api/auth/otp`,
+        `${API}/otp`,
         null,
         {
           params: {
@@ -109,7 +109,7 @@ export default function VerifyOtp() {
 
     try {
 
-      await axios.post(`${API}/api/auth/resend-otp`, null, {
+      await axios.post(`${API}/resend-otp`, null, {
         params: { email }
       });
 

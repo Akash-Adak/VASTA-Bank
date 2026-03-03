@@ -17,7 +17,7 @@ const loanTypes = [
     maxRate: 21,
     defaultRate: 15,
     description: "Quick funds for personal needs with instant approval",
-    applyLink: "https://applyonline.hdfcbank.com/personal-loans.html",
+    applyLink: "/",
     knowMoreLink: "/personal-loan"
   },
   {
@@ -34,7 +34,7 @@ const loanTypes = [
     maxRate: 15,
     defaultRate: 8.75,
     description: "Build your dream home with long tenure and flexible options",
-    applyLink: "https://portal.hdfc.com/",
+    applyLink: "/",
     knowMoreLink: "/home-loan"
   },
   {
@@ -51,7 +51,7 @@ const loanTypes = [
     maxRate: 20,
     defaultRate: 8.7,
     description: "Drive your dream car with competitive interest rates",
-    applyLink: "https://applycarloan.hdfcbank.com/",
+    applyLink: "/",
     knowMoreLink: "/car-loan"
   },
   {
@@ -68,7 +68,7 @@ const loanTypes = [
     maxRate: 10.6,
     defaultRate: 10.5,
     description: "Leverage your property value for substantial funds",
-    applyLink: "https://leads.hdfcbank.com/applications/webforms/apply/lap_apply_frm.asp",
+    applyLink: "/p",
     knowMoreLink: "/loan-against-property"
   }
  
