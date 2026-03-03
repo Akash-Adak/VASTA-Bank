@@ -19,7 +19,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: auth-service
+                name: auth
                 port:
                   number: 8081
 
@@ -28,7 +28,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: user-service
+                name: user
                 port:
                   number: 8082
 
@@ -37,6 +37,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: account-service
+                name: account
                 port:
                   number: 8083

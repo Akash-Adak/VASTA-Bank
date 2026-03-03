@@ -13,7 +13,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [useVirtualKeyboard, setUseVirtualKeyboard] = useState(false);
 
-  const API = import.meta.env.k8s.VITE_AUTH_URL;
+  const API = import.meta.env.VITE_AUTH_URL;
 
 const  handleLogin = async (e) => {
   e.preventDefault();

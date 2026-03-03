@@ -10,7 +10,7 @@ export default function VerifyOtp() {
   const location = useLocation();
 
   const email = location.state?.email;
-  const API = import.meta.env.k8s.VITE_AUTH_URL;
+  const API = import.meta.env.VITE_AUTH_URL;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
