@@ -1,12 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: vasta-ingress
+  name: frontend-ingress
   namespace: vasta-bank
 spec:
+  ingressClassName: nginx
   rules:
-    - host: vastabank.local
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
@@ -15,3 +15,28 @@ spec:
                 name: frontend
                 port:
                   number: 80
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8081
+
+          # User Service
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 8082
+
+          # Account Service
+          - path: /api/accounts
+            pathType: Prefix
+            backend:
+              service:
+                name: account-service
+                port:
+                  number: 8083
