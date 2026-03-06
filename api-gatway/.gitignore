@@ -1,0 +1,3 @@
+src/main/resources/application-prod.yml
+src/main/resources/public.key
+/target

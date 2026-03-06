@@ -34,6 +34,7 @@
 		<module>kyc-service</module>
 		<module>admin-server</module>
 		<module>Payment-gatway-server</module>
+		<module>api-gatway</module>
 
 
 	</modules>

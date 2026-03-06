@@ -118,6 +118,21 @@ services:
     networks:
       - vasta-network
 
+# =========================
+# API Gateway
+# =========================
+  gatway-server:
+    image: akta2910/vasta-gatway:latest
+    container_name: apiGatway-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: always
+    networks:
+      - vasta-network
+
 
   # =========================
   # Auth Service (LOCAL BUILD)

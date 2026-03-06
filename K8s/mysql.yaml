@@ -18,12 +18,20 @@ spec:
           image: mysql:8
           env:
             - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: vasta-secret
-                  key: MYSQL_PASSWORD
+              value: root123
+
+            - name: MYSQL_DATABASE
+              value: vasta_auth
+
+            - name: MYSQL_USER
+              value: vasta
+
+            - name: MYSQL_PASSWORD
+              value: vasta123
+
           ports:
             - containerPort: 3306
+
 ---
 apiVersion: v1
 kind: Service
