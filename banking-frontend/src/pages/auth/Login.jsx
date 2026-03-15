@@ -13,7 +13,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [useVirtualKeyboard, setUseVirtualKeyboard] = useState(false);
 
-  const API = import.meta.env.VITE_AUTH_URL;
+  const API = import.meta.env.VITE_API_URL;
 
 const  handleLogin = async (e) => {
   e.preventDefault();
@@ -29,8 +29,9 @@ const  handleLogin = async (e) => {
   setError("");
 
   try {
-    const res = await axios.post(`${API}/api/auth/login`, form);
-// const res = await axios.post("/api/auth/login", form);
+      // For development, we can use a relative URL since our proxy is set up in package.json
+//     const res = await axios.post(`${API}/api/auth/login`, form);
+const res = await axios.post("/api/auth/login", form);
 
     // Save data immediately
     localStorage.setItem("username", form.username);

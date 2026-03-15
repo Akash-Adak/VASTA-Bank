@@ -78,18 +78,8 @@ export default function VerifyOtp() {
       setLoading(true);
       setError("");
 
-//       await axios.post(
-//         "/api/auth/otp",
-//         null,
-//         {
-//           params: {
-//             email,
-//             otp: finalOtp
-//           }
-//         }
-//       );
-   await axios.post(
-        `${API}/api/auth/otp`,
+      await axios.post(
+        "/api/auth/otp",
         null,
         {
           params: {
@@ -98,6 +88,18 @@ export default function VerifyOtp() {
           }
         }
       );
+
+  // for development, use the full URL to avoid CORS issues. In production, the relative URL will work fine.
+//    await axios.post(
+//         `${API}/api/auth/otp`,
+//         null,
+//         {
+//           params: {
+//             email,
+//             otp: finalOtp
+//           }
+//         }
+//       );
       toast.success("Registration Successful 🎉");
 
       setTimeout(() => {
