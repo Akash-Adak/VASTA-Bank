@@ -34,6 +34,8 @@ jobs:
             image: vasta-admin
           - service: Payment-gatway-server
             image: vasta-payment
+          - service: Api-gatway-server
+            image: vasta-api-gateway
 
           # ---------------- FRONTEND ----------------
           - service: banking-frontend

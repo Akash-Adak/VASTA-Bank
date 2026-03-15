@@ -122,8 +122,8 @@ services:
 # API Gateway
 # =========================
   gatway-server:
-    image: akta2910/vasta-gatway:latest
-    container_name: apiGatway-server
+    image: akta2910/vasta-gateway:latest
+    container_name: apiGateway-server
     ports:
       - "8080:8080"
     depends_on:
