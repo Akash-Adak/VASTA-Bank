@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notification
+  name: notification-service
   namespace: vasta-bank
 spec:
   replicas: 2
@@ -15,21 +15,18 @@ spec:
     spec:
       containers:
         - name: notification
-          image: akta2910/vasta-notification:latest
+          image: akta2910/vasta-notify:latest
+          ports:
+            - containerPort: 8085
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
           envFrom:
             - configMapRef:
                 name: vasta-config
             - secretRef:
                 name: vasta-secret
-          ports:
-            - containerPort: 8085
-          resources:
-            requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
+
 
 ---
 apiVersion: v1
