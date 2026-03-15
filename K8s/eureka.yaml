@@ -1,32 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eureka
+  name: eureka-server
   namespace: vasta-bank
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: eureka
+      app: eureka-server
   template:
     metadata:
       labels:
-        app: eureka
+        app: eureka-server
     spec:
       containers:
-        - name: eureka
+        - name: eureka-server
           image: akta2910/vasta-eureka:latest
           ports:
             - containerPort: 8761
+          env:
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "false"
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "false"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: eureka
+  name: eureka-server
   namespace: vasta-bank
 spec:
   selector:
-    app: eureka
+    app: eureka-server
   ports:
     - port: 8761
       targetPort: 8761
+  type: ClusterIP
