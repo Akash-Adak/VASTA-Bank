@@ -34,7 +34,7 @@ jobs:
             image: vasta-admin
           - service: Payment-gatway-server
             image: vasta-payment
-          - service: Api-gatway-server
+          - service: api-gatway
             image: vasta-api-gateway
 
           # ---------------- FRONTEND ----------------
