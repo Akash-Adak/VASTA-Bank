@@ -19,7 +19,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
-  const API = import.meta.env.VITE_AUTH_URL;
+  const API = import.meta.env.VITE_API_URL;
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -47,7 +47,7 @@ export default function Signup() {
         role: form.role.toUpperCase(),
         password: form.password,
       };
-
+//       For development, we can use a relative URL since our proxy is set up in package.json
 //       await axios.post(`${API}/api/auth/register`, payload);
 await axios.post("/api/auth/register", payload);
       navigate("/verify-otp", {

@@ -10,12 +10,14 @@ export default function VerifyOtp() {
   const location = useLocation();
 
   const email = location.state?.email;
-  const API = import.meta.env.VITE_AUTH_URL;
+  const API = import.meta.env.VITE_API_URL;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(60);
+
+//   const API = import.meta.env.VITE_AUTH_URL;
 
   const inputsRef = useRef([]);
 
@@ -87,6 +89,17 @@ export default function VerifyOtp() {
         }
       );
 
+  // for development, use the full URL to avoid CORS issues. In production, the relative URL will work fine.
+//    await axios.post(
+//         `${API}/api/auth/otp`,
+//         null,
+//         {
+//           params: {
+//             email,
+//             otp: finalOtp
+//           }
+//         }
+//       );
       toast.success("Registration Successful 🎉");
 
       setTimeout(() => {

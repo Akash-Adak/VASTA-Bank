@@ -26,14 +26,13 @@
 		<module>user-service</module>
 		<module>transaction-server</module>
         <module>notification-server</module>
-
-<!--		<module>cloud</module>-->
         <module>auth-server</module>
         <module>eureka-server</module>
 		<module>loan-server</module>
 		<module>kyc-service</module>
 		<module>admin-server</module>
 		<module>Payment-gatway-server</module>
+		<module>api-gatway</module>
 
 
 	</modules>

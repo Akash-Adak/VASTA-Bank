@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api_loan = axios.create({
-  baseURL: import.meta.env.VITE_LOAN_URL,
+  baseURL:"",
 });
 
 api_loan.interceptors.request.use((config) => {

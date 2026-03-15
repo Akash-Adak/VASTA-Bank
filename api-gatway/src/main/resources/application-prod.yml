@@ -1,0 +1,90 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      routes:
+
+        - id: auth-service
+          uri: lb://AUTH
+          predicates:
+            - Path=/api/auth/**
+
+        - id: user-service
+          uri: lb://USER
+          predicates:
+            - Path=/api/users/**
+
+        - id: account-service
+          uri: lb://ACCOUNT
+          predicates:
+            - Path=/api/accounts/**
+
+        - id: transaction-service
+          uri: lb://TRANSACTION
+          predicates:
+            - Path=/api/transactions/**
+
+        - id: loan-service
+          uri: lb://LOAN
+          predicates:
+            - Path=/api/loans/**
+
+        - id: notification-service
+          uri: lb://NOTIFICATION
+          predicates:
+            - Path=/api/notifications/**
+
+        - id: payment-service
+          uri: lb://PAYMENT
+          predicates:
+            - Path=/api/payments/**
+
+        - id: admin-service
+          uri: lb://ADMIN
+          predicates:
+            - Path=/api/admin/**
+
+        - id: kyc-service
+          uri: lb://KYC
+          predicates:
+            - Path=/api/kyc/**
+
+
+
+
+
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns:
+              - "http://localhost"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
