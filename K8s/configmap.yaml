@@ -5,8 +5,12 @@ metadata:
   namespace: vasta-bank
 data:
   SPRING_PROFILES_ACTIVE: prod
-  EUREKA_SERVER_URL: http://eureka:8761/eureka
+  EUREKA_SERVER_URL: http://eureka-server:8761/eureka
   MYSQL_HOST: mysql
   MYSQL_PORT: "3306"
   REDIS_HOST: redis
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vasta_auth
+  SPRING_DATASOURCE_USERNAME: vasta
+  SPRING_DATASOURCE_PASSWORD: vasta123
+  spring.kafka.bootstrap-servers: kafka:9092
