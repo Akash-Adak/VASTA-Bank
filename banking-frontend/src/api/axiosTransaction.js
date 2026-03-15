@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api_transaction = axios.create({
-  baseURL: import.meta.env.VITE_TRANSACTION_URL,
+  baseURL: "",
 });
 
 api_transaction.interceptors.request.use((config) => {
