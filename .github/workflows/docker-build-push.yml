@@ -1,4 +1,4 @@
-name: Build and Push Docker Images
+name: CI-CD Pipeline (Docker + Kubernetes)
 
 on:
   push:
@@ -7,13 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  # -------------------------------
+  # JOB 1: BUILD & PUSH IMAGES
+  # -------------------------------
   build-and-push:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         include:
-          # ---------------- BACKEND SERVICES ----------------
           - service: eureka-server
             image: vasta-eureka
           - service: auth-server
@@ -36,47 +39,81 @@ jobs:
             image: vasta-payment
           - service: api-gatway
             image: vasta-api-gateway
-
-          # ---------------- FRONTEND ----------------
           - service: banking-frontend
             image: vasta-frontend
 
     steps:
-      # Step 1: Checkout code
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Step 2: Setup JDK (only needed for backend)
-      - name: Set up JDK 17
+      - name: Setup JDK 17
         if: matrix.service != 'banking-frontend'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: maven
 
-      # Step 3: Build backend services (skip for frontend)
       - name: Build with Maven
         if: matrix.service != 'banking-frontend'
         run: mvn -B clean package -DskipTests
 
-      # Step 4: Set up Docker Buildx
-      - name: Set up Docker Buildx
+      - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 5: Login to Docker Hub
-      - name: Login to Docker Hub
+      - name: Login DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 6: Build and push Docker image
-      - name: Build and push Docker image
+      - name: Build & Push
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.service }}
           file: ./${{ matrix.service }}/Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:latest
+
+
+  # -------------------------------
+  # JOB 2: DEPLOY + TEST K8S
+  # -------------------------------
+  deploy-and-test:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install kubectl
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      # Create Kubernetes cluster
+      - name: Create Kind Cluster
+        uses: helm/kind-action@v1.8.0
+
+      # Deploy everything
+      - name: Apply Kubernetes YAMLs
+        run: kubectl apply -f k8s/
+
+      # Wait for system
+      - name: Wait for Deployments
+        run: |
+          kubectl wait --for=condition=available --timeout=300s deployment --all
+
+      # Debug (VERY IMPORTANT)
+      - name: Get Pods
+        run: kubectl get pods -A
+
+      - name: Get Services
+        run: kubectl get svc -A
+
+      - name: Describe if failed
+        if: failure()
+        run: kubectl describe pods -A
+
+      - name: Logs if failed
+        if: failure()
+        run: kubectl logs -A --tail=50
