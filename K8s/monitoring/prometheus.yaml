@@ -57,14 +57,12 @@ data:
       scrape_interval: 15s
 
     scrape_configs:
-      - job_name: 'kubernetes-pods'
-        kubernetes_sd_configs:
-          - role: pod
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-            action: keep
-            regex: true
 
+      - job_name: 'auth'
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets:
+              - auth.vasta-bank.svc.cluster.local:8081
 ---
 # -------------------------------
 # Deployment
