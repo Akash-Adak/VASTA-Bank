@@ -133,7 +133,17 @@ jobs:
       # -------------------------------
       - name: Wait for Deployments
         run: |
-          kubectl rollout status deployment --all -n vasta-bank --timeout=300s
+          echo "⏳ Waiting for deployments..."
+
+          DEPLOYS=$(kubectl get deployments -n vasta-bank -o jsonpath='{.items[*].metadata.name}')
+
+          for deploy in $DEPLOYS; do
+            echo ""
+            echo "===== $deploy ====="
+            kubectl rollout status deployment/$deploy -n vasta-bank --timeout=300s || exit 1
+          done
+
+          echo "✅ All deployments are ready"
 
       # -------------------------------
       # STEP 5: Show Cluster State (Nice Logs)
