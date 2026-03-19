@@ -43,25 +43,22 @@ jobs:
             image: vasta-frontend
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup JDK 17
         if: matrix.service != 'banking-frontend'
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
 
       - name: Build with Maven
         if: matrix.service != 'banking-frontend'
         run: mvn -B clean package -DskipTests
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
 
-      - name: Login DockerHub
-        uses: docker/login-action@v3
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -83,117 +80,134 @@ jobs:
     needs: build-and-push
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Install kubectl
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
+      - uses: azure/setup-kubectl@v4
 
-      # Create Kubernetes cluster
-      - name: Create Kind Cluster
-        uses: helm/kind-action@v1.8.0
+      - uses: helm/kind-action@v1.8.0
 
-        # -------------------------------
-      # STEP 1: Create Namespace FIRST
+      # -------------------------------
+      # Install Optional Components
+      # -------------------------------
+      - name: Install Metrics Server (for HPA)
+        run: |
+          kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml || true
+
+      - name: Install OpenKruise (for CloneSet)
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/openkruise/kruise/master/charts/kruise/crds/kruise_crds.yaml || true
+
+      # -------------------------------
+      # Namespace
       # -------------------------------
       - name: Create Namespace
-        run: |
-          kubectl create namespace vasta-bank || echo "Namespace already exists"
+        run: kubectl create namespace vasta-bank || true
 
       # -------------------------------
-      # STEP 2: Apply All YAMLs
+      # Apply Resources (ORDERED)
       # -------------------------------
-      - name: Apply Kubernetes YAMLs
+      - name: Apply Base Resources
         run: |
-          kubectl apply -f K8s/
+          kubectl apply -f K8s/namespace.yaml || true
+          kubectl apply -f K8s/secret.yaml || true
+          kubectl apply -f K8s/configmap.yaml || true
+
+      - name: Apply Infra (DB / Kafka / Redis)
+        run: |
+          kubectl apply -f K8s/mysql.yaml || true
+          kubectl apply -f K8s/redis.yaml || true
+          kubectl apply -f K8s/kafka.yaml || true
+
+      - name: Apply Core Services
+        run: |
+          kubectl apply -f K8s/eureka.yaml || true
+          kubectl apply -f K8s/api-gateway.yaml || true
+
+      - name: Apply Deployments Folder
+        run: kubectl apply -f K8s/deployment/ || true
+
+      - name: Apply Monitoring
+        run: kubectl apply -f K8s/monitoring/ || true
+
+      - name: Apply HPA
+        run: kubectl apply -f K8s/hpa/ || true
+
+      - name: Apply CloneSet
+        run: kubectl apply -f K8s/cloneset/ || true
 
       # -------------------------------
-      # STEP 3: Wait for Pods to be Ready
+      # WAIT FOR SYSTEM
       # -------------------------------
       - name: Wait for Pods Ready
         run: |
-          echo "⏳ Waiting for pods to be ready..."
+          echo "⏳ Waiting for pods..."
 
           for i in {1..30}; do
             NOT_READY=$(kubectl get pods -n vasta-bank --no-headers 2>/dev/null | grep -v Running | wc -l)
 
             if [ "$NOT_READY" -eq 0 ]; then
-              echo "✅ All pods are running"
+              echo "✅ All pods running"
               break
             fi
 
-            echo "Waiting... ($i/30)"
             kubectl get pods -n vasta-bank
             sleep 10
           done
 
-      # -------------------------------
-      # STEP 4: Ensure Deployments Ready
-      # -------------------------------
       - name: Wait for Deployments
         run: |
-          echo "⏳ Waiting for deployments..."
-
           DEPLOYS=$(kubectl get deployments -n vasta-bank -o jsonpath='{.items[*].metadata.name}')
 
-          for deploy in $DEPLOYS; do
-            echo ""
-            echo "===== $deploy ====="
-            kubectl rollout status deployment/$deploy -n vasta-bank --timeout=300s || exit 1
+          for d in $DEPLOYS; do
+            echo "👉 $d"
+            kubectl rollout status deployment/$d -n vasta-bank --timeout=300s || exit 1
           done
 
-          echo "✅ All deployments are ready"
+      # -------------------------------
+      # HEALTH CHECK (REAL TEST)
+      # -------------------------------
+      - name: API Gateway Health Check
+        run: |
+          kubectl port-forward svc/api-gateway 8080:8080 -n vasta-bank &
+          sleep 15
+          curl -f http://localhost:8080/actuator/health
 
       # -------------------------------
-      # STEP 5: Show Cluster State (Nice Logs)
+      # CLUSTER SUMMARY
       # -------------------------------
       - name: Cluster Summary
         run: |
-          echo "===== PODS ====="
           kubectl get pods -n vasta-bank -o wide
-
-          echo "===== SERVICES ====="
           kubectl get svc -n vasta-bank
-
-          echo "===== DEPLOYMENTS ====="
           kubectl get deploy -n vasta-bank
 
       # -------------------------------
-      # STEP 6: Fail if Something is Broken
+      # VALIDATION
       # -------------------------------
       - name: Validate Pods Health
         run: |
           NOT_READY=$(kubectl get pods -n vasta-bank --no-headers | grep -v Running | wc -l)
 
           if [ "$NOT_READY" -gt 0 ]; then
-            echo "❌ Some pods are NOT running"
+            echo "❌ Some pods not running"
             kubectl get pods -n vasta-bank
             exit 1
-          else
-            echo "✅ System is healthy"
           fi
 
-      # Debug (VERY IMPORTANT)
-      - name: Get Pods
-        run: kubectl get pods -A -o wide
-
-      - name: Get Services
-        run: kubectl get svc -A
-
-      - name: Describe if failed
-        if: failure()
-        run: kubectl describe pods -A
+      # -------------------------------
+      # DEBUG
+      # -------------------------------
+      - name: Debug Info
+        run: |
+          kubectl get pods -A -o wide
+          kubectl get svc -A
 
       - name: Logs if failed
         if: failure()
         run: |
-          echo "===== DEBUG LOGS ====="
-
           for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
             for pod in $(kubectl get pods -n $ns -o jsonpath='{.items[*].metadata.name}'); do
-              echo ""
-              echo "===== [$ns] $pod ====="
+              echo "[$ns] $pod"
               kubectl logs -n $ns $pod --all-containers=true --tail=50 || true
             done
           done
