@@ -96,7 +96,7 @@ jobs:
 
       # Deploy everything
       - name: Apply Kubernetes YAMLs
-        run: kubectl apply -f k8s/
+        run: kubectl apply -f K8s/
 
       # Wait for system
       - name: Wait for Deployments
@@ -105,7 +105,7 @@ jobs:
 
       # Debug (VERY IMPORTANT)
       - name: Get Pods
-        run: kubectl get pods -A
+        run: kubectl get pods -A -o wide
 
       - name: Get Services
         run: kubectl get svc -A
@@ -116,4 +116,13 @@ jobs:
 
       - name: Logs if failed
         if: failure()
-        run: kubectl logs -A --tail=50
+        run: |
+          echo "===== DEBUG LOGS ====="
+
+          for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
+            for pod in $(kubectl get pods -n $ns -o jsonpath='{.items[*].metadata.name}'); do
+              echo ""
+              echo "===== [$ns] $pod ====="
+              kubectl logs -n $ns $pod --all-containers=true --tail=50 || true
+            done
+          done
