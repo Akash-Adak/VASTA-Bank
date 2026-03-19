@@ -94,14 +94,85 @@ jobs:
       - name: Create Kind Cluster
         uses: helm/kind-action@v1.8.0
 
-      # Deploy everything
-      - name: Apply Kubernetes YAMLs
-        run: kubectl apply -f K8s/
+        # -------------------------------
+      # STEP 1: Create Namespace FIRST
+      # -------------------------------
+      - name: Create Namespace
+        run: |
+          kubectl create namespace vasta-bank || echo "Namespace already exists"
 
-      # Wait for system
+      # -------------------------------
+      # STEP 2: Apply All YAMLs
+      # -------------------------------
+      - name: Apply Kubernetes YAMLs
+        run: |
+          kubectl apply -f K8s/
+
+      # -------------------------------
+      # STEP 3: Wait for Pods to be Ready
+      # -------------------------------
+      - name: Wait for Pods Ready
+        run: |
+          echo "⏳ Waiting for pods to be ready..."
+
+          for i in {1..30}; do
+            NOT_READY=$(kubectl get pods -n vasta-bank --no-headers 2>/dev/null | grep -v Running | wc -l)
+
+            if [ "$NOT_READY" -eq 0 ]; then
+              echo "✅ All pods are running"
+              break
+            fi
+
+            echo "Waiting... ($i/30)"
+            kubectl get pods -n vasta-bank
+            sleep 10
+          done
+
+      # -------------------------------
+      # STEP 4: Ensure Deployments Ready
+      # -------------------------------
       - name: Wait for Deployments
         run: |
-          kubectl wait --for=condition=available --timeout=300s deployment --all
+          echo "⏳ Waiting for deployments..."
+
+          DEPLOYS=$(kubectl get deployments -n vasta-bank -o jsonpath='{.items[*].metadata.name}')
+
+          for deploy in $DEPLOYS; do
+            echo ""
+            echo "===== $deploy ====="
+            kubectl rollout status deployment/$deploy -n vasta-bank --timeout=300s || exit 1
+          done
+
+          echo "✅ All deployments are ready"
+
+      # -------------------------------
+      # STEP 5: Show Cluster State (Nice Logs)
+      # -------------------------------
+      - name: Cluster Summary
+        run: |
+          echo "===== PODS ====="
+          kubectl get pods -n vasta-bank -o wide
+
+          echo "===== SERVICES ====="
+          kubectl get svc -n vasta-bank
+
+          echo "===== DEPLOYMENTS ====="
+          kubectl get deploy -n vasta-bank
+
+      # -------------------------------
+      # STEP 6: Fail if Something is Broken
+      # -------------------------------
+      - name: Validate Pods Health
+        run: |
+          NOT_READY=$(kubectl get pods -n vasta-bank --no-headers | grep -v Running | wc -l)
+
+          if [ "$NOT_READY" -gt 0 ]; then
+            echo "❌ Some pods are NOT running"
+            kubectl get pods -n vasta-bank
+            exit 1
+          else
+            echo "✅ System is healthy"
+          fi
 
       # Debug (VERY IMPORTANT)
       - name: Get Pods
