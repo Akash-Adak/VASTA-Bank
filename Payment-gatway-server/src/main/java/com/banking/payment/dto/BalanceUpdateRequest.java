@@ -7,10 +7,16 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
+
 @NoArgsConstructor
 public class BalanceUpdateRequest {
     private String accountNumber;
+
+    public BalanceUpdateRequest(String accountNumber, BigDecimal amount) {
+        this.accountNumber = accountNumber;
+        this.amount = amount;
+    }
+
     private BigDecimal amount;
 
     public String getAccountNumber() {
