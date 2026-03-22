@@ -101,7 +101,7 @@ jobs:
       # Namespace
       # -------------------------------
       - name: Create Namespace
-        run: kubectl create namespace vasta-bank || true
+        run: kubectl create namespace vasta || true
 
       # -------------------------------
       # Apply Resources (ORDERED)
@@ -143,24 +143,24 @@ jobs:
           echo "⏳ Waiting for pods..."
 
           for i in {1..30}; do
-            NOT_READY=$(kubectl get pods -n vasta-bank --no-headers 2>/dev/null | grep -v Running | wc -l)
+            NOT_READY=$(kubectl get pods -n vasta --no-headers 2>/dev/null | grep -v Running | wc -l)
 
             if [ "$NOT_READY" -eq 0 ]; then
               echo "✅ All pods running"
               break
             fi
 
-            kubectl get pods -n vasta-bank
+            kubectl get pods -n vasta
             sleep 10
           done
 
       - name: Wait for Deployments
         run: |
-          DEPLOYS=$(kubectl get deployments -n vasta-bank -o jsonpath='{.items[*].metadata.name}')
+          DEPLOYS=$(kubectl get deployments -n vasta -o jsonpath='{.items[*].metadata.name}')
 
           for d in $DEPLOYS; do
             echo "👉 $d"
-            kubectl rollout status deployment/$d -n vasta-bank --timeout=300s || exit 1
+            kubectl rollout status deployment/$d -n vasta --timeout=300s || exit 1
           done
 
       # -------------------------------
@@ -168,7 +168,7 @@ jobs:
       # -------------------------------
       - name: API Gateway Health Check
         run: |
-          kubectl port-forward svc/api-gateway 8080:8080 -n vasta-bank &
+          kubectl port-forward svc/api-gateway 8080:8080 -n vasta &
           sleep 15
           curl -f http://localhost:8080/actuator/health
 
@@ -177,20 +177,20 @@ jobs:
       # -------------------------------
       - name: Cluster Summary
         run: |
-          kubectl get pods -n vasta-bank -o wide
-          kubectl get svc -n vasta-bank
-          kubectl get deploy -n vasta-bank
+          kubectl get pods -n vasta -o wide
+          kubectl get svc -n vasta
+          kubectl get deploy -n vasta
 
       # -------------------------------
       # VALIDATION
       # -------------------------------
       - name: Validate Pods Health
         run: |
-          NOT_READY=$(kubectl get pods -n vasta-bank --no-headers | grep -v Running | wc -l)
+          NOT_READY=$(kubectl get pods -n vasta --no-headers | grep -v Running | wc -l)
 
           if [ "$NOT_READY" -gt 0 ]; then
             echo "❌ Some pods not running"
-            kubectl get pods -n vasta-bank
+            kubectl get pods -n vasta
             exit 1
           fi
 
