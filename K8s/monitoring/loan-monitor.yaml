@@ -9,7 +9,7 @@ spec:
       app: loan
   namespaceSelector:
     matchNames:
-      - vasta-bank
+      - vasta
   endpoints:
     - port: http
       path: /actuator/prometheus
