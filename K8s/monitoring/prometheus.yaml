@@ -62,7 +62,7 @@ data:
         metrics_path: /actuator/prometheus
         static_configs:
           - targets:
-              - auth.vasta-bank.svc.cluster.local:8081
+              - auth.vasta.svc.cluster.local:8081
 ---
 # -------------------------------
 # Deployment

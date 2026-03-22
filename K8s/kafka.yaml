@@ -4,7 +4,7 @@ metadata:
   labels:
     app: kafka-broker
   name: kafka
-  namespace: vasta-bank
+  namespace: vasta
 spec:
   selector:
     app: kafka-broker
@@ -19,7 +19,7 @@ metadata:
   labels:
     app: kafka-broker
   name: kafka-broker
-  namespace: vasta-bank
+  namespace: vasta
 spec:
   replicas: 1
   selector:

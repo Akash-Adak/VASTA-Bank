@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: vasta-config
-  namespace: vasta-bank
+  namespace: vasta
 data:
   SPRING_PROFILES_ACTIVE: prod
   EUREKA_SERVER_URL: http://eureka-server:8761/eureka
