@@ -41,12 +41,20 @@ jobs:
           echo "New version: $NEW_VERSION"
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create Git Tag
+      - name: Create Git Tag (safe)
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git tag ${{ steps.set_version.outputs.version }}
-          git push origin ${{ steps.set_version.outputs.version }}
+          VERSION=${{ steps.set_version.outputs.version }}
+          
+          git fetch --tags
+          
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Tag already exists: $VERSION, skipping..."
+          else
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git tag $VERSION
+            git push origin $VERSION
+          fi
 
   # -------------------------------
   # JOB 2: BUILD & PUSH IMAGES
