@@ -6,6 +6,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
 
   # -------------------------------
@@ -43,8 +46,50 @@ jobs:
             image: vasta-frontend
 
     steps:
+      # -------------------------------
+      # CHECKOUT
+      # -------------------------------
       - uses: actions/checkout@v4
 
+      # -------------------------------
+      # AUTO VERSIONING (RUN ONCE ONLY)
+      # -------------------------------
+      - name: Get latest tag
+        if: matrix.service == 'eureka-server'
+        run: |
+          git fetch --tags
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+          echo "LATEST_TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Increment version
+        if: matrix.service == 'eureka-server'
+        run: |
+          VERSION=${LATEST_TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          PATCH=$((PATCH+1))
+          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Create Git Tag
+        if: matrix.service == 'eureka-server'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git tag $NEW_VERSION
+          git push origin $NEW_VERSION
+
+      # -------------------------------
+      # SHARE VERSION TO ALL MATRIX JOBS
+      # -------------------------------
+      - name: Set default version (fallback)
+        run: |
+          if [ -z "$NEW_VERSION" ]; then
+            echo "NEW_VERSION=dev-${GITHUB_SHA::7}" >> $GITHUB_ENV
+          fi
+
+      # -------------------------------
+      # BUILD JAVA SERVICES
+      # -------------------------------
       - name: Setup JDK 17
         if: matrix.service != 'banking-frontend'
         uses: actions/setup-java@v4
@@ -56,6 +101,9 @@ jobs:
         if: matrix.service != 'banking-frontend'
         run: mvn -B clean package -DskipTests
 
+      # -------------------------------
+      # DOCKER SETUP
+      # -------------------------------
       - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
@@ -63,13 +111,19 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # -------------------------------
+      # BUILD & PUSH DOCKER IMAGES
+      # -------------------------------
       - name: Build & Push
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.service }}
           file: ./${{ matrix.service }}/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:${{ env.NEW_VERSION }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:latest
+            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:${{ github.sha }}
 
 
   # -------------------------------
