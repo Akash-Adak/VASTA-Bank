@@ -29,33 +29,52 @@ jobs:
           TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
           echo "Latest tag: $TAG"
 
-      - name: Increment version
+      - name: Increment version (safe)
         id: set_version
         run: |
+          git fetch --tags
           VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
           VERSION=${VERSION#v}
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           PATCH=$((PATCH+1))
           NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
-
-          echo "New version: $NEW_VERSION"
+          
+          # Ensure uniqueness
+          if git rev-parse "$NEW_VERSION" >/dev/null 2>&1; then
+            NEW_VERSION="${NEW_VERSION}-$(date +%s)"
+          fi
+          
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Git Tag (safe)
+        id: create_tag
         run: |
           VERSION=${{ steps.set_version.outputs.version }}
-          
+
           git fetch --tags
-          
+
           if git rev-parse "$VERSION" >/dev/null 2>&1; then
-            echo "Tag already exists: $VERSION, skipping..."
+            echo "Tag already exists: $VERSION"
+            echo "created=false" >> $GITHUB_OUTPUT
           else
             git config user.name "github-actions"
             git config user.email "actions@github.com"
             git tag $VERSION
             git push origin $VERSION
+            echo "created=true" >> $GITHUB_OUTPUT
           fi
-
+      - name: Create GitHub Release
+        if: steps.create_tag.outputs.created == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.set_version.outputs.version }}
+          name: Release ${{ steps.set_version.outputs.version }}
+          body: |
+            🚀 Automated Release
+        
+            🔖 Version: ${{ steps.set_version.outputs.version }}
+            👤 Author: ${{ github.actor }}
+            🧾 Commit: ${{ github.sha }}
   # -------------------------------
   # JOB 2: BUILD & PUSH IMAGES
   # -------------------------------
