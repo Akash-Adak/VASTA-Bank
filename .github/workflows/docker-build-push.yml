@@ -29,21 +29,28 @@ jobs:
           TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
           echo "Latest tag: $TAG"
 
-      - name: Increment version (safe)
+      - name: Increment version (clean)
         id: set_version
         run: |
           git fetch --tags
+          
           VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
           VERSION=${VERSION#v}
+          
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-          PATCH=$((PATCH+1))
-          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
           
-          # Ensure uniqueness
-          if git rev-parse "$NEW_VERSION" >/dev/null 2>&1; then
-            NEW_VERSION="${NEW_VERSION}-$(date +%s)"
-          fi
+          while true; do
+            PATCH=$((PATCH+1))
+            NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
           
+            if git rev-parse "$NEW_VERSION" >/dev/null 2>&1; then
+              echo "Version $NEW_VERSION exists, incrementing..."
+            else
+              break
+            fi
+          done
+          
+          echo "Final version: $NEW_VERSION"
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Git Tag (safe)
