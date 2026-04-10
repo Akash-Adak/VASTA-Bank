@@ -215,7 +215,7 @@ jobs:
       - name: Apply Core Services
         run: |
           kubectl apply -f K8s/eureka.yaml || true
-          kubectl apply -f K8s/deployments/api-gateway.yaml || true
+          kubectl apply -f K8s/cloneset/api-gateway.yaml || true
 
       - name: Apply Deployments Folder
         run: kubectl apply -f K8s/deployments/ || true
