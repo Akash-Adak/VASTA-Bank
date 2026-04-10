@@ -25,7 +25,7 @@ spec:
                 name: vasta-secret
           ports:
             - name: http
-            - containerPort: 8082
+            - containerPort: 8083
           resources:
             requests:
               cpu: "200m"
@@ -35,7 +35,7 @@ spec:
               memory: "512Mi"
 
   updateStrategy:
-    type: InPlaceIfPossible   
+    type: InPlaceIfPossible
 
     rollingUpdate:
       partition: 4
@@ -53,5 +53,5 @@ spec:
     app: account
   ports:
 
-    - port: 8082
-      targetPort: 8082
+    - port: 8083
+      targetPort: 8083

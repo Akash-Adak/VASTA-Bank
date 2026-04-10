@@ -1,13 +1,15 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps.kruise.io/v1beta1
+kind: CloneSet
 metadata:
   name: user
   namespace: vasta
 spec:
-  replicas: 2
+  replicas: 6
+
   selector:
     matchLabels:
       app: user
+
   template:
     metadata:
       labels:
@@ -15,13 +17,14 @@ spec:
     spec:
       containers:
         - name: user
-          image: akta2910/vasta-user:latest
+          image: akta2910/vasta-user:v1.0.3
           envFrom:
             - configMapRef:
                 name: vasta-config
             - secretRef:
                 name: vasta-secret
           ports:
+            - name: http
             - containerPort: 8082
           resources:
             requests:
@@ -30,6 +33,14 @@ spec:
             limits:
               cpu: "500m"
               memory: "512Mi"
+
+  updateStrategy:
+    type: InPlaceIfPossible   # ✅ FIXED HERE
+
+    rollingUpdate:
+      partition: 4
+      maxUnavailable: 1
+      maxSurge: 1
 
 ---
 apiVersion: v1
@@ -41,5 +52,6 @@ spec:
   selector:
     app: user
   ports:
+
     - port: 8082
       targetPort: 8082
