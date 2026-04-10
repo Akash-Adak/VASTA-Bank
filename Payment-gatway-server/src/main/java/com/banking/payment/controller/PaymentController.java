@@ -8,6 +8,7 @@ import com.banking.payment.dto.BalanceUpdateRequest;
 import com.banking.payment.dto.PaymentOrder;
 import com.banking.payment.repository.PaymentOrderRepo;
 import com.banking.payment.util.PaymentVerificationUtil;
+import com.razorpay.RazorpayException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,71 +41,47 @@ public class PaymentController {
     private PaymentOrderRepo orderRepo;
 
     @PostMapping("/create-order")
-    public Map<String, String> createOrder(
-            @RequestBody Map<String, Object> requestData
-    ) {
+    public Map<String, String> createOrder(@RequestBody Map<String, Object> requestData) throws RazorpayException {
+
+        Object amtObj = requestData.get("amount");
+
+        if (amtObj == null) {
+            throw new IllegalArgumentException("Amount is required");
+        }
+
+        BigDecimal amount = new BigDecimal(amtObj.toString());
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Invalid amount");
+        }
+
+        RazorpayClient razorpay = new RazorpayClient(razorpayKey, razorpaySecret);
+
+        int amountInPaise = amount.multiply(new BigDecimal("100")).intValueExact();
+
+        JSONObject orderRequest = new JSONObject();
+        orderRequest.put("amount", amountInPaise);
+        orderRequest.put("currency", "INR");
+        orderRequest.put("receipt", "receipt_" + System.currentTimeMillis());
+
+        Order order = razorpay.orders.create(orderRequest);
+
+        PaymentOrder po = new PaymentOrder();
+        po.setOrderId(order.get("id"));
+        po.setAmount(amount);
+        po.setAccountNumber(requestData.get("accountNumber").toString());
+        po.setStatus("CREATED");
+
+        orderRepo.save(po);
 
         Map<String, String> response = new HashMap<>();
-
-        try {
-
-            Object amtObj = requestData.get("amount");
-
-            if (amtObj == null) {
-                throw new IllegalArgumentException("Amount is required");
-            }
-
-            BigDecimal amount = new BigDecimal(amtObj.toString());
-
-            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalArgumentException("Invalid amount");
-            }
-
-            RazorpayClient razorpay =
-                    new RazorpayClient(razorpayKey, razorpaySecret);
-
-            int amountInPaise =
-                    amount.multiply(new BigDecimal("100"))
-                            .intValueExact();
-
-            JSONObject orderRequest = new JSONObject();
-
-            orderRequest.put("amount", amountInPaise);
-            orderRequest.put("currency", "INR");
-            orderRequest.put("receipt",
-                    "receipt_" + System.currentTimeMillis());
-
-            Order order =
-                    razorpay.orders.create(orderRequest);
-
-            response.put("orderId", order.get("id").toString());
-            response.put("amount", order.get("amount").toString());
-            response.put("currency", order.get("currency").toString());
-            response.put("key", razorpayKey);
-
-            PaymentOrder po = new PaymentOrder();
-
-            po.setOrderId(order.get("id"));
-            po.setAmount(amount);
-            po.setAccountNumber(
-                    requestData.get("accountNumber").toString()
-            );
-            po.setStatus("CREATED");
-
-            orderRepo.save(po);
-
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            response.put("error", e.getMessage());
-        }
+        response.put("orderId", order.get("id").toString());
+        response.put("amount", order.get("amount").toString());
+        response.put("currency", order.get("currency").toString());
+        response.put("key", razorpayKey);
 
         return response;
     }
-
-
 
 
     @PostMapping("/verify")
