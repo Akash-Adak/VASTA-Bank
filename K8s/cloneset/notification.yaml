@@ -1,23 +1,23 @@
 apiVersion: apps.kruise.io/v1beta1
 kind: CloneSet
 metadata:
-  name: auth
+  name: notification
   namespace: vasta
 spec:
   replicas: 6
 
   selector:
     matchLabels:
-      app: auth
+      app: notification
 
   template:
     metadata:
       labels:
-        app: auth
+        app: notification
     spec:
       containers:
-        - name: auth
-          image: akta2910/vasta-auth:v1.0.3
+        - name: notification
+          image: akta2910/vasta-notify:v1.0.3
           envFrom:
             - configMapRef:
                 name: vasta-config
@@ -25,7 +25,7 @@ spec:
                 name: vasta-secret
           ports:
             - name: http
-            - containerPort: 8081
+            - containerPort: 8085
           resources:
             requests:
               cpu: "200m"
@@ -46,12 +46,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth
+  name: notification
   namespace: vasta
 spec:
   selector:
-    app: auth
+    app: notification
   ports:
 
-    - port: 8081
-      targetPort: 8081
+    - port: 8085
+      targetPort: 8085

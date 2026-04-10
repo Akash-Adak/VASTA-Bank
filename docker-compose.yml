@@ -93,7 +93,7 @@ services:
 # =========================
 
   frontend:
-    image: akta2910/vasta-frontend:latest
+    image: akta2910/vasta-frontend:v1.0.3
     container_name: vasta-frontend
     ports:
       - "5173:80"
@@ -105,7 +105,7 @@ services:
   # Eureka Server
   # =========================
   eureka-server:
-    image: akta2910/vasta-eureka:latest
+    image: akta2910/vasta-eureka:v1.0.3
     container_name: eureka-server
     ports:
       - "8761:8761"
@@ -122,7 +122,7 @@ services:
 # API Gateway
 # =========================
   gatway-server:
-    image: akta2910/vasta-gateway:latest
+    image: akta2910/vasta-gateway:v1.0.3
     container_name: apiGateway-server
     ports:
       - "8080:8080"
@@ -138,7 +138,7 @@ services:
   # Auth Service (LOCAL BUILD)
   # =========================
   auth-service:
-    image: akta2910/vasta-auth:latest
+    image: akta2910/vasta-auth:v1.0.3
     container_name: auth-service
     ports:
       - "8081:8081"
@@ -161,7 +161,7 @@ services:
   # User Service
   # =========================
   user-service:
-    image: akta2910/vasta-user:latest
+    image: akta2910/vasta-user:v1.0.3
     container_name: user-service
     ports:
       - "8082:8082"
@@ -179,7 +179,7 @@ services:
   # Account Service
   # =========================
   account-service:
-    image: akta2910/vasta-account:latest
+    image: akta2910/vasta-account:v1.0.3
     container_name: account-service
     ports:
       - "8083:8083"
@@ -197,7 +197,7 @@ services:
   # Transaction Service
   # =========================
   transaction-service:
-    image: akta2910/vasta-transaction:latest
+    image: akta2910/vasta-transaction:v1.0.3
     container_name: transaction-service
     ports:
       - "8084:8084"
@@ -217,7 +217,7 @@ services:
   # Notification Service
   # =========================
   notification-service:
-    image: akta2910/vasta-notify:latest
+    image: akta2910/vasta-notify:v1.0.3
     container_name: notification-service
     ports:
       - "8085:8085"
@@ -239,7 +239,7 @@ services:
   # Payment Service
   # =========================
   payment-service:
-    image: akta2910/vasta-payment:latest
+    image: akta2910/vasta-payment:v1.0.3
     container_name: payment-service
     ports:
       - "8089:8089"
@@ -261,7 +261,7 @@ services:
   # KYC Service
   # =========================
   kyc-service:
-    image: akta2910/vasta-kyc:latest
+    image: akta2910/vasta-kyc:v1.0.3
     container_name: kyc-service
     ports:
       - "8087:8087"
@@ -281,7 +281,7 @@ services:
   # Admin Service
   # =========================
   admin-service:
-    image: akta2910/vasta-admin:latest
+    image: akta2910/vasta-admin:v1.0.3
     container_name: admin-service
     ports:
       - "8088:8088"

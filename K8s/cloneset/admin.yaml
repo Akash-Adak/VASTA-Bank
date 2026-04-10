@@ -1,28 +1,31 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps.kruise.io/v1beta1
+kind: CloneSet
 metadata:
-  name: payment
+  name: admin
   namespace: vasta
 spec:
-  replicas: 2
+  replicas: 6
+
   selector:
     matchLabels:
-      app: payment
+      app: admin
+
   template:
     metadata:
       labels:
-        app: payment
+        app: admin
     spec:
       containers:
-        - name: payment
-          image: akta2910/vasta-payment:latest
+        - name: admin
+          image: akta2910/vasta-admin:v1.0.3
           envFrom:
             - configMapRef:
                 name: vasta-config
             - secretRef:
                 name: vasta-secret
           ports:
-            - containerPort: 8089
+            - name: http
+            - containerPort: 8088
           resources:
             requests:
               cpu: "200m"
@@ -31,15 +34,24 @@ spec:
               cpu: "500m"
               memory: "512Mi"
 
+  updateStrategy:
+    type: InPlaceIfPossible   # ✅ FIXED HERE
+
+    rollingUpdate:
+      partition: 4
+      maxUnavailable: 1
+      maxSurge: 1
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: payment
+  name: admin
   namespace: vasta
 spec:
   selector:
-    app: payment
+    app: admin
   ports:
-    - port: 8089
-      targetPort: 8089
+
+    - port: 8088
+      targetPort: 8088
