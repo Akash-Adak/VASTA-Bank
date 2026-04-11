@@ -23,7 +23,7 @@ export default function Footer() {
               {/* <div className="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center font-bold text-2xl shadow-lg shadow-blue-900/50">B</div> */}
                 <div className="relative flex items-center justify-center">
                 <img 
-                      src="/vasta-bank-logo.png" 
+                      src="/vasta-bank-logo-removebg-preview.png" 
                       alt="Vasta Logo" 
                       /* Changed h-11 to h-16 for a significantly larger presence */
                       className="h-16 w-auto object-contain transition-all duration-500 group-hover:scale-110 filter drop-shadow-2xl"

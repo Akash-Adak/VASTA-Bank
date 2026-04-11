@@ -302,7 +302,7 @@ export default function Navbar() {
               
               <div className="relative flex items-center justify-center">
                 <img 
-                      src="/vasta-bank-logo.png" 
+                      src="/vasta-bank-logo-removebg-preview.png" 
                       alt="Vasta Logo" 
                       /* Changed h-11 to h-16 for a significantly larger presence */
                       className="h-16 w-auto object-contain transition-all duration-500 group-hover:scale-110 filter drop-shadow-2xl"
