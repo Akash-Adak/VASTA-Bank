@@ -9,7 +9,7 @@
   ╚═══╝  ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝
 ```
 <p align="center">
-  <img src="assets/vasta-bank-logo.png" width="100px" />
+  <img src="assets/vasta-logo.png" width="100px" />
 </p>
 ### **Enterprise-Grade Full-Stack Digital Banking Platform**
 
