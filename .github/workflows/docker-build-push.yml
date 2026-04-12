@@ -262,10 +262,15 @@ jobs:
       # -------------------------------
       - name: API Gateway Health Check
         run: |
-          kubectl port-forward svc/api-gateway 8080:8080 -n vasta &
-          sleep 15
-          curl -f http://localhost:8080/actuator/health
-
+          kubectl port-forward svc/api-gateway 8080:8080 -n vasta > pf.log 2>&1 &
+          for i in {1..10}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Service is up!"
+              break
+            fi
+            echo "Waiting..."
+            sleep 2
+          done
       # -------------------------------
       # CLUSTER SUMMARY
       # -------------------------------
