@@ -6,9 +6,9 @@ spring:
     name: auth
 
   datasource:
-    url: jdbc:mysql://mysql:3306/vasta_system?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true&connectTimeout=10000&socketTimeout=30000
-    username: root
-    password: root
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     hikari:
@@ -31,9 +31,11 @@ spring:
     type: redis
   data:
     redis:
-      host: redis
-      port: 6379
-      timeout: 5000
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      timeout: 3000
 
 jwt:
   expiration: 3600000

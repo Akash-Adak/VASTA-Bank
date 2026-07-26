@@ -25,9 +25,11 @@ spring:
     type: redis
   data:
     redis:
-      host: redis
-      port: 6379
-      timeout: 5000
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      timeout: 3000
 
   kafka:
     bootstrap-servers: kafka:9092
