@@ -19,7 +19,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: vastabank.official@gmail.com
-    password: ${EMAIL_PASSWORD:wtliwgoqkzrgrlcg}
+    password: ${EMAIL_PASSWORD:zjvgpmxvpzqixuqo}
     properties:
       mail:
         smtp:

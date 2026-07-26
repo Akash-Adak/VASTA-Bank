@@ -10,15 +10,14 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:mysql://mysql:3306/vasta_system?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true&connectTimeout=10000&socketTimeout=30000
-    username: root
-    password: root
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     hikari:
       initialization-fail-timeout: -1
       connection-timeout: 30000
-
   jpa:
     hibernate:
       ddl-auto: update
