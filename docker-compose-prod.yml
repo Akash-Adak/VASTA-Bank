@@ -69,7 +69,7 @@ services:
   # Eureka Server
   # =========================
   eureka-server:
-    image: akta2910/vasta-eureka:v1.0.7
+    image: akta2910/vasta-eureka:v1.0.8
     container_name: eureka-server
     restart: always
 
@@ -97,7 +97,7 @@ services:
   # API Gateway
   # =========================
   gateway-server:
-    image: akta2910/vasta-api-gateway:v1.0.7
+    image: akta2910/vasta-api-gateway:v1.0.8
     container_name: apiGateway-server
 
     restart: always
@@ -130,7 +130,7 @@ services:
   # Auth Service
   # =========================
   auth-service:
-    image: akta2910/vasta-auth:v1.0.7
+    image: akta2910/vasta-auth:v1.0.8
     container_name: auth-service
 
     restart: always
@@ -169,7 +169,7 @@ services:
   # User Service
   # =========================
   user-service:
-    image: akta2910/vasta-user:v1.0.7
+    image: akta2910/vasta-user:v1.0.8
     container_name: user-service
 
     restart: always
@@ -206,7 +206,7 @@ services:
   # Account Service
 
   account-service:
-    image: akta2910/vasta-account:v1.0.7
+    image: akta2910/vasta-account:v1.0.8
     container_name: account-service
     env_file:
       - .env
@@ -224,7 +224,7 @@ services:
         condition: service_healthy
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -242,7 +242,7 @@ services:
   # Transaction Service
   # =========================
   transaction-service:
-    image: akta2910/vasta-transaction:v1.0.7
+    image: akta2910/vasta-transaction:v1.0.8
     container_name: transaction-service
 
     restart: always
@@ -282,7 +282,7 @@ services:
   # Notification Service
   # =========================
   notification-service:
-    image: akta2910/vasta-notify:v1.0.7
+    image: akta2910/vasta-notify:v1.0.8
     container_name: notification-service
 
     restart: always
@@ -322,7 +322,7 @@ services:
   # Payment Service
   # =========================
   payment-service:
-    image: akta2910/vasta-payment:v1.0.7
+    image: akta2910/vasta-payment:v1.0.8
     container_name: payment-service
 
     restart: always
@@ -361,7 +361,7 @@ services:
   # KYC Service
   # =========================
   kyc-service:
-    image: akta2910/vasta-kyc:v1.0.7
+    image: akta2910/vasta-kyc:v1.0.8
     container_name: kyc-service
 
     restart: always
@@ -401,7 +401,7 @@ services:
   # Admin Service
   # =========================
   admin-service:
-    image: akta2910/vasta-admin:v1.0.7
+    image: akta2910/vasta-admin:v1.0.8
     container_name: admin-service
 
     restart: always
