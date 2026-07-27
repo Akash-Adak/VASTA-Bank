@@ -32,7 +32,7 @@ spring:
       timeout: 3000
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: account-group
       auto-offset-reset: earliest
